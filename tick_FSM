@@ -1,0 +1,46 @@
+// created 13/09/2024
+// ver: 1.0
+// created by Cooper
+module tick_FSM(reset,clk,enable,tick);
+    input clk;
+    input w;
+    input reset; 
+    output tick; //clock for reg
+    
+    reg [3:0] current_state, next_state;
+    
+    parameter A= 4'b0000, B= 4'b0001, C = 4'b0010, D = 4'b0100, E = 4'b1000; //one hot
+    
+    always @(w,currnet_state) begin
+        case(next_state)
+            A: 
+                if (w) current_state = B;
+                else current_state = A;
+            B: 
+                if (w) current_state = C;
+                else current_state = A;
+            C: 
+                if (w) current_state =D;
+                else current_state = A;
+            D: 
+                if (w) current_state = A;
+                else current_state = A;
+            default : next_state = 4'b0000;
+        endcase
+    end
+
+    always @(posedge clk) begin
+        next_state <= current_state;
+    end 
+
+    always @(*) begin
+        if (next_state == w) begin 
+        tick <= next_state;
+        else begin 
+        tick == 4'b0000;
+        end 
+    end 
+
+endmodule
+
+
