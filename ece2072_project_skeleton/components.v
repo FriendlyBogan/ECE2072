@@ -24,7 +24,44 @@ module tick_FSM(rst, clk, enable, tick);
 	 */
 
 	// TODO: Declare inputs and outputs
-	
+	input clk;
+    input rst; 
+    input enable; // assume enable signal is 4 bits
+    output tick; //clock for reg
+
+    // enable is a 1 bit wire 
+    
+    reg [3:0] current_state, next_state;
+    
+    parameter A= 4'b0000, B= 4'b0001, C = 4'b0010, D = 4'b0100, E = 4'b1000; //one hot
+    
+    always @(enable,currnet_state) begin
+        if (enable == 1) begin
+            case(next_state)
+                A: 
+                    next_state = B;
+                B: 
+                    next_state = C;
+                C: 
+                    next_state = D;
+                D: 
+                    next_state = A;
+                default : next_state = 4'b0000;
+            endcase
+        else begin 
+            current_state = 4'b0000;
+        end
+    end
+
+	always @(posedge clk ) begin
+		if (rst) begin
+			current_state = 4'b0000;
+		end 
+	end
+
+    always @(posedge clk) begin
+        current_state <= next_state;
+    end 
     // TODO: implement FSM
 endmodule
 
