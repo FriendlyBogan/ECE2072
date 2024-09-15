@@ -49,6 +49,7 @@ module tick_FSM(rst, clk, enable, tick);
                     next_state = A;
                 default : next_state = 4'b0000;
             endcase
+		end
         else begin 
             current_state = 4'b0000;
         end
