@@ -6,14 +6,15 @@ This file contains Verilog code to implement individual components to be used in
 Please enter your name and student ID:
 
 */
-module sign_extend(in, ext);
+module sign_extend(input [8:0]in, output [15:0]ext);
 	/* 
 	 * This module sign extends the 9-bit Din to a 16-bit output.
 	 */
-	// TODO: Declare inputs and outputs
-	
-	// TODO: implement logic
+
+	assign ext[8:0] = in[8:0];
+	assign ext[15:9] = in[8] ? 255 : 0;
 endmodule
+
 
 
 
