@@ -72,10 +72,29 @@ module multiplexer(SignExtDin, R0, R1, R2, R3, R4, R5, R6, R7, G, sel, Bus);
 	 * This module takes 10 inputs and places the correct input onto the bus.
 	 */
 	// TODO: Declare inputs and outputs
-	
+	input [15:0] SignExtDin;
+	input [3:0] sel;
+	input [15:0] R0, R1, R2, R3, R4, R5, R6, R7;
+	input [15:0] G;
+	output [15:0] Bus;
+
 	// TODO: implement logic
+	always @(sel) begin 
 
-
+		case (sel)
+		4'b0000: R0 <= Bus; 
+		4'b0001: R1 <= Bus; 
+		4'b0010: R2 <= Bus; 
+		4'b0011: R3 <= Bus; 
+		4'b0100: R4 <= Bus; 
+		4'b0101: R5 <= Bus; 
+		4'b0110: R6 <= Bus; 
+		4'b0111: R7 <= Bus; 
+		4'b1000: G <= Bus; 
+		4'b1001: SignExtDin <= Bus; 
+		default: Bus <= Bus; // Default case for unused states
+		endcase
+    end
 endmodule
 
 module ALU (input_a, input_b, alu_op, result);
@@ -104,7 +123,7 @@ module ALU (input_a, input_b, alu_op, result);
 			
 			sub: result <= input_a - input_b;
 			
-			shift: result <= input_b <<< input_a;	
+			shift: result <= input_b <<< input_a;		
 			default: result <= 0;
 		endcase
 	end
