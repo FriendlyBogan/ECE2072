@@ -78,6 +78,8 @@ module multiplexer(SignExtDin, R0, R1, R2, R3, R4, R5, R6, R7, G, sel, Bus);
 	input [15:0] G;
 	output [15:0] Bus;
 
+	assign sel = [9:6] SignExtDin // taking the original data 
+
 	// TODO: implement logic
 	always @(sel) begin 
 
