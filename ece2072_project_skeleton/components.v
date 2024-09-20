@@ -82,27 +82,32 @@ module ALU (input_a, input_b, alu_op, result);
 	 * This module implements the arithmetic logic unit of the processor.
 	 */
 	// TODO: declare inputs and outputs
-	input input_a;
-	input input_b;
-	input alu_op;
-	output result;
+	input [15:0]input_a;
+	input [15:0]input_b;
+	input [2:0]alu_op;
+	output [15:0]result;
 
 
 	// TODO: Implement ALU Logic:
-	parameter: mul = 3'b000, add = 3'b001, sub = 3'b010, shift = 3'b011;
+	parameter 
+			mul = 3'b000, 
+			add = 3'b001, 
+			sub = 3'b010, 
+			shift = 3'b011; //dont cares has been emitted 
 	
 	always  @(input_a,input_b) begin
-		case (alu_op):
+		case (alu_op)
 		
-			mul: result = input_a * input_b;
+			mul: result <= input_a * input_b;
 			
-			add: result = input_a + input_b;
+			add: result <= input_a + input_b;
 			
-			sub: result = input_a - input_b;
+			sub: result <= input_a - input_b;
 			
-			shift: result = input_b <<< input_a;
-				
+			shift: result <= input_b <<< input_a;	
+			default: result <= 0;
 		endcase
+	end
 endmodule
 
 
