@@ -11,8 +11,8 @@ module sign_extend(input [8:0]in, output [15:0]ext);
 	 * This module sign extends the 9-bit Din to a 16-bit output.
 	 */
 
-	assign ext[8:0] = in[8:0];
-	assign ext[15:9] = in[8] ? 255 : 0;
+	assign ext = {{7{in[8]}}, in} // this is checking 9th bit of in, replicating it 7 times then concatenating it with in
+	
 endmodule
 
 
@@ -108,6 +108,7 @@ module ALU (input_a, input_b, alu_op, result);
 	input [2:0]alu_op;
 	output [15:0]result;
 
+	reg [15:0] result;
 
 	// TODO: Implement ALU Logic:
 	parameter 
@@ -119,13 +120,13 @@ module ALU (input_a, input_b, alu_op, result);
 	always  @(input_a,input_b) begin
 		case (alu_op)
 		
-			mul: result <= input_a * input_b;
+			mul: result <= input_a * input_b; 
 			
 			add: result <= input_a + input_b;
 			
 			sub: result <= input_a - input_b;
 			
-			shift: result <= input_b <<< input_a;		
+			shift: result <= input_b <<< input_a; 		
 			default: result <= 0;
 		endcase
 	end
