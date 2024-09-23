@@ -12,7 +12,7 @@ module sign_extend(input [8:0]in, output [15:0]ext);
 	 */
 
 	assign ext = {{7{in[8]}}, in} // this is checking 9th bit of in, replicating it 7 times then concatenating it with in
-	
+
 endmodule
 
 
@@ -117,7 +117,7 @@ module ALU (input_a, input_b, alu_op, result);
 			sub = 3'b010, 
 			shift = 3'b011; //dont cares has been emitted 
 	
-	always  @(input_a,input_b) begin
+	always  @(input_a,input_b,alu_op) begin
 		case (alu_op)
 		
 			mul: result <= input_a * input_b; 
