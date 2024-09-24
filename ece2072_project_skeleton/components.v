@@ -12,7 +12,7 @@ module sign_extend(input [8:0]in, output [15:0]ext);
 	 */
 
 	assign ext = {{7{in[8]}}, in} // this is checking 9th bit of in, replicating it 7 times then concatenating it with in
-	
+
 endmodule
 
 
@@ -72,30 +72,33 @@ module multiplexer(SignExtDin, R0, R1, R2, R3, R4, R5, R6, R7, G, sel, Bus);
 	 * This module takes 10 inputs and places the correct input onto the bus.
 	 */
 	// TODO: Declare inputs and outputs
-	input [15:0] SignExtDin;
-	input [3:0] sel;
-	input [15:0] R0, R1, R2, R3, R4, R5, R6, R7;
-	input [15:0] G;
-	output [15:0] Bus;
-
-	assign sel = [9:6] SignExtDin // taking the original data 
+	input [15:0] SignExtDin; //user defined input
+	input [3:0] sel; //assuming sel coming from control unit 
+	input [15:0] R0, R1, R2, R3, R4, R5, R6, R7; //diff registered that can be inst
+	input [15:0] G; // outcome of ALU 
+	output [15:0] Bus; 
+ 
 
 	// TODO: implement logic
 	always @(sel) begin 
-
-		case (sel)
-		4'b0000: R0 <= Bus; 
-		4'b0001: R1 <= Bus; 
-		4'b0010: R2 <= Bus; 
-		4'b0011: R3 <= Bus; 
-		4'b0100: R4 <= Bus; 
-		4'b0101: R5 <= Bus; 
-		4'b0110: R6 <= Bus; 
-		4'b0111: R7 <= Bus; 
-		4'b1000: G <= Bus; 
-		4'b1001: SignExtDin <= Bus; 
-		default: Bus <= Bus; // Default case for unused states
-		endcase
+		if (enable) begin 
+			case (sel)   
+				4'b0000: R0 = Bus; 
+				4'b0001: R1 = Bus; 
+				4'b0010: R2 = Bus; 
+				4'b0011: R3 = Bus; 
+				4'b0100: R4 = Bus; 
+				4'b0101: R5 = Bus; 
+				4'b0110: R6 = Bus; 
+				4'b0111: R7 = Bus; 
+				4'b1000: G = Bus; 
+				4'b1001: SignExtDin = Bus;
+				default: Bus = 16'b0; // Default case for unused states
+			endcase
+		end  
+		else begin 
+			Bus = 16'b0;
+		end 
     end
 endmodule
 
@@ -117,7 +120,7 @@ module ALU (input_a, input_b, alu_op, result);
 			sub = 3'b010, 
 			shift = 3'b011; //dont cares has been emitted 
 	
-	always  @(input_a,input_b) begin
+	always  @(input_a,input_b,alu_op) begin
 		case (alu_op)
 		
 			mul: result <= input_a * input_b; 
