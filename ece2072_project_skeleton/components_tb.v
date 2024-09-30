@@ -73,5 +73,38 @@ module components_tb.v;
 
     endmodule
 
+module tickFSM_test;
+
+    reg clk, rst, enable;
+    wire [3:0] tick;
+
+    tick_FSM fsm (
+        .clk(clk),
+        .rst(rst),
+        .enable(enable),
+        .tick(tick)
+    );
+	 
+	 always #5 clk = ~clk;
+	 
+	 initial begin
+        clk = 0;
+        rst = 1; 
+        enable = 0;
+		 
+        #10 rst = 0;
+
+        #10 enable = 1;
+        
+        #100 $finish;
+    end
+
+    initial begin
+        $display("Tick: %b", tick);
+    end
+
+endmodule
+	
+
 
 endmodule
