@@ -144,14 +144,21 @@ module register_n(data_in, r_in, clk, Q, rst);
 	// register_n #(.N(num_bits)) reg_IR(.....), 
 	// where num_bits is how many bits you want to set N to
 	// and "..." is your usual input/output signals
-
 	parameter N = 16;
-
 	/* 
 	 * This module implements registers that will be used in the processor.
 	 */
 	// TODO: Declare inputs, outputs, and parameter:
-	
+	input [16:0]data_in;
+	input r_in;
+	input clk;
+	input rst;
+	output reg [N:0]Q;
+
 	// TODO: Implement register logic:
+	always @(posedge clk) begin
+		if (rst) Q <= 0;
+		else if (r_in) Q <= data_in[N:0];
+	end
 endmodule
 
