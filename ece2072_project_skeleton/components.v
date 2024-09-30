@@ -15,57 +15,51 @@ module sign_extend(input [8:0]in, output [15:0]ext);
 
 endmodule
 
+module tick_FSM (
+    input wire clk,     
+    input wire rst,      
+    input wire enable,  
+    output reg [3:0] tick  
+);
 
-
-
-module tick_FSM(rst, clk, enable, tick);
-	/* 
-	 * This module implements a tick FSM that will be used to
-	 * control the actions of the control unit
-	 */
-
-	// TODO: Declare inputs and outputs
-	input clk;
-    input rst; 
-    input enable; // assume enable signal is 4 bits
-    output tick; //clock for reg
-
-    // enable is a 1 bit wire 
+    
+    parameter A = 4'b0001,  
+              B = 4'b0010,  
+              C = 4'b0100,  
+              D = 4'b1000;  
     
     reg [3:0] current_state, next_state;
-    
-    parameter A= 4'b0000, B= 4'b0001, C = 4'b0010, D = 4'b0100, E = 4'b1000; //one hot
-    
-    always @(enable,currnet_state) begin
-        if (enable == 1) begin
-            case(next_state)
-                A: 
-                    next_state = B;
-                B: 
-                    next_state = C;
-                C: 
-                    next_state = D;
-                D: 
-                    next_state = A;
-                default : next_state = 4'b0000;
+
+    always @(current_state, enable) begin
+        
+        next_state = current_state;
+
+        if (enable) begin
+		  
+            case (current_state)
+                A: next_state = B;  
+                B: next_state = C;  
+                C: next_state = D;  
+                D: next_state = A; 
+                default: next_state = A;  
             endcase
-		end 
-        else begin 
-            current_state = 4'b0000;
         end
     end
 
-	always @(posedge clk ) begin
-		if (rst) begin
-			current_state = 4'b0000;
-		end 
-	end
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            current_state <= A;  
+        end else begin
+            current_state <= next_state; 
+        end
+    end
 
-    always @(posedge clk) begin
-        current_state <= next_state;
-    end 
-    // TODO: implement FSM
+    always @(current_state) begin
+        tick = current_state;  // Output the current state as the tick value
+    end
+
 endmodule
+
 
 module multiplexer(SignExtDin, R0, R1, R2, R3, R4, R5, R6, R7, G, sel, Bus);
 	/* 
