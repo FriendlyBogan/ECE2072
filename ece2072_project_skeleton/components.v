@@ -103,17 +103,19 @@ module multiplexer(SignExtDin, R0, R1, R2, R3, R4, R5, R6, R7, G, sel, Bus);
 endmodule
 
 module ALU (input_a, input_b, alu_op, result);
-	 * This module implements the arithmetic logic unit of the processor.
-	 */
+	 // This module implements the arithmetic logic unit of the processor.
 	// TODO: declare inputs and outputs
-	input [15:0]input_a;
-	input [15:0]input_b;
+	input signed [15:0]input_a;
+	input signed [15:0]input_b;
 	input [2:0]alu_op;
-	output [15:0]result;
+	output reg [15:0]result;
+	
+	reg signed [31:0] result_calc; //maximum number of bits possible even with 16 bits
 
-	reg [15:0] result;
 
-	// TODO: Implement ALU Logic:
+	// TODO: manage overflow
+	
+	
 	parameter 
 			mul = 3'b000, 
 			add = 3'b001, 
@@ -122,18 +124,49 @@ module ALU (input_a, input_b, alu_op, result);
 	
 	always  @(input_a,input_b,alu_op) begin
 		case (alu_op)
-		
-			mul: result <= input_a * input_b; 
 			
-			add: result <= input_a + input_b;
+			mul: result_calc = input_a * input_b;
 			
-			sub: result <= input_a - input_b;
+			add: result_calc = input_a + input_b;
 			
-			shift: result <= input_b <<< input_a; 		
-			default: result <= 0;
+			sub: result_calc = input_a - input_b;
+			 
+			shift: 
+				
+				if (input_a >= 0) begin
+				
+                    result_calc = input_b <<< input_a[3:0]; // only ranging [3:0] so that it would only shift in range of 16 bits 
+						  
+                end else begin
+					 
+                    result_calc = input_b >>> -input_a[3:0]; // - to make it negative
+						  
+				end
+			
+			default: result_calc = 32'b0;
+			
 		endcase
+		
+		if (result_calc > 16'sb0111111111111111) begin
+		
+			 result = 16'sb0111111111111111;  // limit to the max positive 16-bit value
+			 
+		end else if (result_calc < 16'sb1000000000000000) begin
+		
+			 result = 16'sb1000000000000000;  // limit to the max negative 16-bit value
+			 
+		end else begin
+		
+			 result = result_calc[15:0]; 
+			 
+		end
+		
+		
 	end
 endmodule
+
+
+
 
 
 
