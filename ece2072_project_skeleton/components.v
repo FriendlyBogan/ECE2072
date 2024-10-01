@@ -74,7 +74,7 @@ module multiplexer(SignExtDin, R0, R1, R2, R3, R4, R5, R6, R7, G, sel, Bus);
 	// TODO: Declare inputs and outputs
 	input [15:0] SignExtDin; //user defined input
 	input [3:0] sel; //assuming sel coming from control unit 
-	input [15:0] R0, R1, R2, R3, R4, R5, R6, R7; //diff registered that can be inst
+	input [15:0] R0, R1, R2, R3, R4, R5, R6, R7; //different registered that can be inst
 	input [15:0] G; // outcome of ALU 
 	output [15:0] Bus; 
  
@@ -83,21 +83,21 @@ module multiplexer(SignExtDin, R0, R1, R2, R3, R4, R5, R6, R7, G, sel, Bus);
 	always @(sel) begin 
 		if (enable) begin 
 			case (sel)   
-				4'b0000: R0 = Bus; 
-				4'b0001: R1 = Bus; 
-				4'b0010: R2 = Bus; 
-				4'b0011: R3 = Bus; 
-				4'b0100: R4 = Bus; 
-				4'b0101: R5 = Bus; 
-				4'b0110: R6 = Bus; 
-				4'b0111: R7 = Bus; 
-				4'b1000: G = Bus; 
-				4'b1001: SignExtDin = Bus;
+				4'b0000: Bus = R0; 
+				4'b0001: Bus = R1; 
+				4'b0010: Bus = R2; 
+				4'b0011: Bus = R3; 
+				4'b0100: Bus = R4; 
+				4'b0101: Bus = R5; 
+				4'b0110: Bus = R6; 
+				4'b0111: Bus = R7; 
+				4'b1000: Bus = G; 
+				4'b1001: Bus = SignExtDin;
 				default: Bus = 16'b0; // Default case for unused states
 			endcase
 		end  
 		else begin 
-			Bus = 16'b0;
+			Bus = 16'd0;
 		end 
     end
 endmodule
@@ -149,16 +149,16 @@ module register_n(data_in, r_in, clk, Q, rst);
 	 * This module implements registers that will be used in the processor.
 	 */
 	// TODO: Declare inputs, outputs, and parameter:
-	input [16:0]data_in;
+	input [15:0]data_in;
 	input r_in;
 	input clk;
 	input rst;
-	output reg [N:0]Q;
+	output reg [N-1:0]Q;
 
 	// TODO: Implement register logic:
 	always @(posedge clk) begin
 		if (rst) Q <= 0;
-		else if (r_in) Q <= data_in[N:0];
+		else if (r_in) Q <= data_in[N-1:0];
 	end
 endmodule
 
