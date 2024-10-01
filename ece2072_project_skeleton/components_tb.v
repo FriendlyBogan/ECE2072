@@ -104,7 +104,61 @@ module tickFSM_test;
     end
 
 endmodule
-	
+
+module test_register_n;
+    reg [15:0] data_in;
+    reg rst, r_in, clk;
+    wire [15:0]Q;
+    register_n #(.N(16)) test(.data_in(data_in), .r_in(r_in), .clk(clk), .rst(rst), .Q(Q));
+    
+    integer count, error;
+    initial begin
+        data_in = 16'b1111;
+        rst = 1;
+        clk = 0;
+        r_in = 1;
+        error = 0;
+        count = 0;
+        #2
+        clk = 1;
+        #1
+        clk = 0;
+        if (Q != 0) begin
+            error = error + 1;
+            $display("Q is %b, should be 0", Q);
+        end
+        #1
+        rst = 0;
+        r_in = 0;
+        #2
+        clk = 1;
+        #1
+        clk = 0;
+        if (Q != 0) begin
+            error = error + 1;
+            $display("Q is %b, should be 0", Q);
+        end
+        #1
+        r_in = 1;
+        data_in = 0;
+    end
+
+    always #15 clk = ~clk;
+
+    always begin
+        for (count = 0; count < 1000; count = count + 1) begin
+        #10
+        data_in = data_in + 1;
+        #20
+        if (Q != data_in) begin
+            error = error + 1;
+            $display("Q is %b, should be %b", Q, data_in);
+        end
+
+        end
+        $finish;
+    end
+endmodule
 
 
 endmodule

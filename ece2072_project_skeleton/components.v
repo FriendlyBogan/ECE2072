@@ -87,7 +87,7 @@ module multiplexer(SignExtDin, R0, R1, R2, R3, R4, R5, R6, R7, G, sel, Bus);
 				4'b0111: Bus = R7; 
 				4'b1000: Bus = G; 
 				4'b1001: Bus = SignExtDin;
-				default: Bus = 16'b0; // Default case for unused states
+				default: Bus = 16'd0; // Default case for unused states
 			endcase
 		end  
 		else begin 
