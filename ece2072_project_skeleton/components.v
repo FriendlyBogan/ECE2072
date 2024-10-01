@@ -15,57 +15,51 @@ module sign_extend(input [8:0]in, output [15:0]ext);
 
 endmodule
 
+module tick_FSM (
+    input wire clk,     
+    input wire rst,      
+    input wire enable,  
+    output reg [3:0] tick  
+);
 
-
-
-module tick_FSM(rst, clk, enable, tick);
-	/* 
-	 * This module implements a tick FSM that will be used to
-	 * control the actions of the control unit
-	 */
-
-	// TODO: Declare inputs and outputs
-	input clk;
-    input rst; 
-    input enable; // assume enable signal is 4 bits
-    output tick; //clock for reg
-
-    // enable is a 1 bit wire 
+    
+    parameter A = 4'b0001,  
+              B = 4'b0010,  
+              C = 4'b0100,  
+              D = 4'b1000;  
     
     reg [3:0] current_state, next_state;
-    
-    parameter A= 4'b0000, B= 4'b0001, C = 4'b0010, D = 4'b0100, E = 4'b1000; //one hot
-    
-    always @(enable,currnet_state) begin
-        if (enable == 1) begin
-            case(next_state)
-                A: 
-                    next_state = B;
-                B: 
-                    next_state = C;
-                C: 
-                    next_state = D;
-                D: 
-                    next_state = A;
-                default : next_state = 4'b0000;
+
+    always @(current_state, enable) begin
+        
+        next_state = current_state;
+
+        if (enable) begin
+		  
+            case (current_state)
+                A: next_state = B;  
+                B: next_state = C;  
+                C: next_state = D;  
+                D: next_state = A; 
+                default: next_state = A;  
             endcase
-		end 
-        else begin 
-            current_state = 4'b0000;
         end
     end
 
-	always @(posedge clk ) begin
-		if (rst) begin
-			current_state = 4'b0000;
-		end 
-	end
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            current_state <= A;  
+        end else begin
+            current_state <= next_state; 
+        end
+    end
 
-    always @(posedge clk) begin
-        current_state <= next_state;
-    end 
-    // TODO: implement FSM
+    always @(current_state) begin
+        tick = current_state;  // Output the current state as the tick value
+    end
+
 endmodule
+
 
 module multiplexer(SignExtDin, R0, R1, R2, R3, R4, R5, R6, R7, G, sel, Bus);
 	/* 
@@ -103,17 +97,19 @@ module multiplexer(SignExtDin, R0, R1, R2, R3, R4, R5, R6, R7, G, sel, Bus);
 endmodule
 
 module ALU (input_a, input_b, alu_op, result);
-	 * This module implements the arithmetic logic unit of the processor.
-	 */
+	 // This module implements the arithmetic logic unit of the processor.
 	// TODO: declare inputs and outputs
-	input [15:0]input_a;
-	input [15:0]input_b;
+	input signed [15:0]input_a;
+	input signed [15:0]input_b;
 	input [2:0]alu_op;
-	output [15:0]result;
+	output reg [15:0]result;
+	
+	reg signed [31:0] result_calc; //maximum number of bits possible even with 16 bits
 
-	reg [15:0] result;
 
-	// TODO: Implement ALU Logic:
+	// TODO: manage overflow
+	
+	
 	parameter 
 			mul = 3'b000, 
 			add = 3'b001, 
@@ -122,18 +118,49 @@ module ALU (input_a, input_b, alu_op, result);
 	
 	always  @(input_a,input_b,alu_op) begin
 		case (alu_op)
-		
-			mul: result <= input_a * input_b; 
 			
-			add: result <= input_a + input_b;
+			mul: result_calc = input_a * input_b;
 			
-			sub: result <= input_a - input_b;
+			add: result_calc = input_a + input_b;
 			
-			shift: result <= input_b <<< input_a; 		
-			default: result <= 0;
+			sub: result_calc = input_a - input_b;
+			 
+			shift: 
+				
+				if (input_a >= 0) begin
+				
+                    result_calc = input_b <<< input_a[3:0]; // only ranging [3:0] so that it would only shift in range of 16 bits 
+						  
+                end else begin
+					 
+                    result_calc = input_b >>> -input_a[3:0]; // - to make it negative
+						  
+				end
+			
+			default: result_calc = 32'b0;
+			
 		endcase
+		
+		if (result_calc > 16'sb0111111111111111) begin
+		
+			 result = 16'sb0111111111111111;  // limit to the max positive 16-bit value
+			 
+		end else if (result_calc < 16'sb1000000000000000) begin
+		
+			 result = 16'sb1000000000000000;  // limit to the max negative 16-bit value
+			 
+		end else begin
+		
+			 result = result_calc[15:0]; 
+			 
+		end
+		
+		
 	end
 endmodule
+
+
+
 
 
 
