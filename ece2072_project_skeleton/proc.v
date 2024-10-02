@@ -74,22 +74,20 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out,tic
             4'b0001:
                 begin
                     // TODO
-						  {A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in} = 1'b0;
+                    {movi, add, addi, sub} = 0;
+							{A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in} = 1'b0;
                     IR_in = 1;
                     if (IR_out[8:6] == 1) begin 
                         add = 1;
 								
                     end 
-						  
-							{movi, add, addi, sub} = 0;
-							
-                    if (IR_out[8:6] == 7) begin 
+                    else if (IR_out[8:6] == 7) begin 
                         movi = 1;
                     end  
 						  
-						  if (IR_out[8:6] == 2) begin 
-								addi = 1;
-						  end 
+                    else if (IR_out[8:6] == 2) begin 
+                        addi = 1;
+                    end 
                    IR_in = 0; 
                 end
             
@@ -104,16 +102,27 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out,tic
                         
                     end
 						  
-						  if (addi) begin 
+					else if (addi) begin 
 						  
-								BUS_control = IR_out[5:3];//Rx
+                        BUS_control = IR_out[5:3];//Rx
+                        
+                        A_in = 1;
 								
-								A_in = 1;
-								
-						  end
-
-
-                end
+                    end
+                    else if (movi) begin
+                        BUS_control = 4'b1001; //Immediate Value
+                        case (IR_out[5:3])
+                            3'b000: R0_in = 1;
+                            3'b001: R1_in = 1;
+                            3'b010: R2_in = 1;
+                            3'b011: R3_in = 1;
+                            3'b100: R4_in = 1;
+                            3'b101: R5_in = 1;
+                            3'b110: R6_in = 1;
+                            3'b111: R7_in = 1;
+                        endcase
+                    end
+				end
             
             4'b0100:
                 begin
@@ -129,18 +138,20 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out,tic
 								ALU_op = 3'b001;
                     end 
 						  
-						  if (addi) begin 
-								
-								A_in = 0;
-								
-								BUS_control = 4'b1001; //Immediate value
-								
-								G_in = 1;
-								
-								ALU_op = 3'b001;
-							
-						  end 
-
+                    else if (addi) begin 
+                        
+                        A_in = 0;
+                        
+                        BUS_control = 4'b1001; //Immediate value
+                        
+                        G_in = 1;
+                        
+                        ALU_op = 3'b001;
+                    
+                    end 
+                    else if (movi) begin
+                        {A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in} = 1'b0;
+                    end
 
                 end
             
@@ -163,24 +174,24 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out,tic
                         
                     end
 						  
-						  if (addi) begin 
-						  
-								BUS_control = 4'b1000;
-								
-								G_in = 0;
-								
-								case (IR_out[5:3])
-                            3'b000: R0_in = 1;
-                            3'b001: R1_in = 1;
-                            3'b010: R2_in = 1;
-                            3'b011: R3_in = 1;
-                            3'b100: R4_in = 1;
-                            3'b101: R5_in = 1;
-                            3'b110: R6_in = 1;
-                            3'b111: R7_in = 1;
-                        endcase
-								
-						  end 
+                    else if (addi) begin 
+                    
+                        BUS_control = 4'b1000;
+                        
+                        G_in = 0;
+                        
+                    case (IR_out[5:3])
+                        3'b000: R0_in = 1;
+                        3'b001: R1_in = 1;
+                        3'b010: R2_in = 1;
+                        3'b011: R3_in = 1;
+                        3'b100: R4_in = 1;
+                        3'b101: R5_in = 1;
+                        3'b110: R6_in = 1;
+                        3'b111: R7_in = 1;
+                    endcase
+                        
+                    end 
 						  
                     
                     IR_in = 1;
