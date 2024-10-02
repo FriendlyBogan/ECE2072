@@ -11,7 +11,7 @@ module sign_extend(input [8:0]in, output [15:0]ext);
 	 * This module sign extends the 9-bit Din to a 16-bit output.
 	 */
 
-	assign ext = {{7{in[8]}}, in} // this is checking 9th bit of in, replicating it 7 times then concatenating it with in
+	assign ext = {{7{in[8]}}, in}; // this is checking 9th bit of in, replicating it 7 times then concatenating it with in
 
 endmodule
 
@@ -177,7 +177,7 @@ module register_n #(parameter N = 16) (data_in, r_in, clk, Q, rst);
 	input rst;
 	output reg [N-1:0]Q;
 
-	initial begin Q = 0;
+	initial  Q = 0;
 
 	// TODO: Implement register logic:
 	always @(posedge clk) begin
