@@ -5,32 +5,33 @@ This file contains Verilog code to implement individual the CPU.
 Please enter your student ID:
 
 */
-module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out);
+module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out,tick, BUS_control, SignExtDin, ALU_out);
 
     // Note: The skeleton you are provided with includes output ports to output the values of the internal registers R0 - R7, for the purpose of test benching. When instantiating the processor to program your DE10-lite, you can leave these ports unused.
     
     // TODO: Declare inputs and outputs:
     input clk;
     input rst;
-    input din;
+    input [8:0]din;
     output [15:0] bus; 
     output [15:0] R0, R1, R2, R3, R4, R5, R6, R7;
     
     
 
     // TODO: declare wires:
-    wire [15:0] G_out, A_out, ALU_out;
-    wire [3:0] tick;
+    wire [15:0] G_out, A_out;
+	 output [15:0] ALU_out;
+    output wire [3:0] tick;
     output wire [8:0] IR_out;
     reg IR_in, A_in, G_in;
     reg R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in;
-    wire [15:0] SignExtDin;
-    reg [3:0] BUS_control;
+    output wire [15:0] SignExtDin;
+    output reg [3:0] BUS_control;
     reg [2:0] ALU_op;
 	 
 
     // TODO: instantiate registers:
-    register_n #(.N(9)) reg_IR(.r_in(IR_in), .clk(clk), .data_in(din), .rst(rst), .Q(IR_out));
+    register_n  #(.N(9))reg_IR(.r_in(IR_in), .clk(clk), .data_in(din), .rst(rst), .Q(IR_out));
     register_n  reg_A(.r_in(A_in), .clk(clk), .data_in(bus), .rst(rst), .Q(A_out));
     register_n  reg_G(.r_in(G_in), .clk(clk), .data_in(ALU_out), .rst(rst), .Q(G_out));
     register_n  reg_0(.r_in(R0_in), .clk(clk), .data_in(bus), .rst(rst), .Q(R0));
@@ -42,22 +43,19 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out);
     register_n  reg_6(.r_in(R6_in), .clk(clk), .data_in(bus), .rst(rst), .Q(R6));
     register_n  reg_7(.r_in(R7_in), .clk(clk), .data_in(bus), .rst(rst), .Q(R7));
     
-
-
+	 
+	
     // TODO: instantiate Multiplexer:
     sign_extend se (.in(din), .ext(SignExtDin));
     multiplexer mux(.SignExtDin(SignExtDin), .R0(R0), .R1(R1), .R2(R2), .R3(R3), .R4(R4), .R5(R5), .R6(R6), .R7(R7), .G(G_out), .sel(BUS_control), .Bus(bus));
     
     // TODO: instantiate ALU:
-    ALU alu(.input_a(A_out), .input_b(bus), .result(ALU_out));
+    ALU alu(.input_a(A_out), .input_b(bus), .alu_op(ALU_op),.result(ALU_out));
     
     // TODO: instantiate tick counter:
     tick_FSM tfsm(.clk(clk), .rst(rst), .enable(1'b1), .tick(tick));
 
     reg [0:0] movi, add, addi,sub;
-
-    reg [8:0] ins; //could be the same IR_out
-
 
           
     
@@ -65,22 +63,26 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out);
     initial begin 
         IR_in = 1;
         {A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in} = 1'b0;
+		  BUS_control = 0;
     end 
 
+	
     always @(tick) begin
         // TODO: Turn off all control signals:
-        {movi, add, addi, sub} = 0;
         // TODO: Turn on specific control signals based on current tick:
         case (tick)
             4'b0001:
                 begin
                     // TODO
+						  {A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in} = 1'b0;
                     IR_in = 1;
                     if (IR_out[8:6] == 1) begin 
                         add = 1;
-                        
+								
                     end 
-
+						  
+							{movi, add, addi, sub} = 0;
+							
                     if (IR_out[8:6] == 7) begin 
                         movi = 1;
                     end  
@@ -88,7 +90,7 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out);
 						  if (IR_out[8:6] == 2) begin 
 								addi = 1;
 						  end 
-                    
+                   IR_in = 0; 
                 end
             
             4'b0010:
@@ -131,7 +133,7 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out);
 								
 								A_in = 0;
 								
-								BUS_control = SignExtDin; //Immediate value
+								BUS_control = 4'b1001; //Immediate value
 								
 								G_in = 1;
 								
