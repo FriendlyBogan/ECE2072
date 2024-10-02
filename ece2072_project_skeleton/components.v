@@ -70,31 +70,27 @@ module multiplexer(SignExtDin, R0, R1, R2, R3, R4, R5, R6, R7, G, sel, Bus);
 	input [3:0] sel; //assuming sel coming from control unit 
 	input [15:0] R0, R1, R2, R3, R4, R5, R6, R7; //different registered that can be inst
 	input [15:0] G; // outcome of ALU 
-	output [15:0] Bus; 
+	output reg [15:0] Bus; 
  
 
 	// TODO: implement logic
-	always @(sel) begin 
-		if (enable) begin 
-			case (sel)   
-				4'b0000: Bus = R0; 
-				4'b0001: Bus = R1; 
-				4'b0010: Bus = R2; 
-				4'b0011: Bus = R3; 
-				4'b0100: Bus = R4; 
-				4'b0101: Bus = R5; 
-				4'b0110: Bus = R6; 
-				4'b0111: Bus = R7; 
-				4'b1000: Bus = G; 
-				4'b1001: Bus = SignExtDin;
-				default: Bus = 16'd0; // Default case for unused states
-			endcase
-		end  
-		else begin 
-			Bus = 16'd0;
-		end 
+	always @(*) begin 
+		case (sel)   
+			4'b0000: Bus = R0; 
+			4'b0001: Bus = R1; 
+			4'b0010: Bus = R2; 
+			4'b0011: Bus = R3; 
+			4'b0100: Bus = R4; 
+			4'b0101: Bus = R5; 
+			4'b0110: Bus = R6; 
+			4'b0111: Bus = R7; 
+			4'b1000: Bus = G; 
+			4'b1001: Bus = SignExtDin;
+			default: Bus = 16'b0; // Default case for unused states
+		endcase
     end
-endmodule
+	 
+endmodule 
 
 module ALU (input_a, input_b, alu_op, result);
 	 // This module implements the arithmetic logic unit of the processor.
