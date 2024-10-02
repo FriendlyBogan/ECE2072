@@ -74,7 +74,7 @@ module multiplexer(SignExtDin, R0, R1, R2, R3, R4, R5, R6, R7, G, sel, Bus);
  
 
 	// TODO: implement logic
-	always @(*) begin 
+	always @(sel) begin 
 		case (sel)   
 			4'b0000: Bus = R0; 
 			4'b0001: Bus = R1; 
@@ -156,32 +156,34 @@ module ALU (input_a, input_b, alu_op, result);
 endmodule
 
 
+module register_n #(parameter N = 16) (data_in, r_in, clk, Q, rst);
 
-
-
-
-module register_n(data_in, r_in, clk, Q, rst);
-
+	
+	
+	
 
 	// To set parameter N during instantiation, you can use:
 	// register_n #(.N(num_bits)) reg_IR(.....), 
 	// where num_bits is how many bits you want to set N to
 	// and "..." is your usual input/output signals
-	parameter N = 16;
+	
 	/* 
 	 * This module implements registers that will be used in the processor.
 	 */
 	// TODO: Declare inputs, outputs, and parameter:
-	input [15:0]data_in;
+	input [N-1:0]data_in;
 	input r_in;
 	input clk;
 	input rst;
 	output reg [N-1:0]Q;
-
+	
+	initial Q = 0;
+	
 	// TODO: Implement register logic:
 	always @(posedge clk) begin
 		if (rst) Q <= 0;
 		else if (r_in) Q <= data_in[N-1:0];
 	end
 endmodule
+
 
