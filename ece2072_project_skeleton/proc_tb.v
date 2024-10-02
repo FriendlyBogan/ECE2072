@@ -46,7 +46,11 @@ module proc_tb;
 	din = 9'b111010000;
 	#7
 	din = 9'b010101010;
-	#43
+	#33
+
+	// TEST SUB
+	din = 9'b011010001;
+	#50
 	
 	$displpy("bus value: %b",bus);
 	$finish;
