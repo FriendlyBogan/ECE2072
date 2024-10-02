@@ -39,7 +39,15 @@ module proc_tb;
 	din = 9'b010001000;
 	#7
 	din = 9'd2;
+	#33
+	
+	// TEST MOVI
+
+	din = 9'b111010000;
+	#7
+	din = 9'b010101010;
 	#43
+	
 	$displpy("bus value: %b",bus);
 	$finish;
 	end 	
