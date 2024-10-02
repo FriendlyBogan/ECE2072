@@ -176,11 +176,14 @@ module register_n(data_in, r_in, clk, Q, rst);
 	 * This module implements registers that will be used in the processor.
 	 */
 	// TODO: Declare inputs, outputs, and parameter:
-	input [15:0]data_in;
+	input [N-1:0]data_in;
 	input r_in;
 	input clk;
 	input rst;
 	output reg [N-1:0]Q;
+
+	initial Q = 0;
+
 
 	// TODO: Implement register logic:
 	always @(posedge clk) begin
