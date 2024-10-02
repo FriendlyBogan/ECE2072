@@ -177,6 +177,8 @@ module register_n #(parameter N = 16) (data_in, r_in, clk, Q, rst);
 	input rst;
 	output reg [N-1:0]Q;
 
+	initial begin Q = 0;
+
 	// TODO: Implement register logic:
 	always @(posedge clk) begin
 		if (rst) Q <= 0;
