@@ -11,67 +11,81 @@ module components_tb.v;
     // TODO: Implement the logic of your testbench here
     module alu_test;
 
-    reg [15:0] input_a;
-    reg [15:0] input_b;
+    // Declare the testbench signals
+    reg signed [15:0] input_a;
+    reg signed [15:0] input_b;
     reg [2:0] alu_op;
-    wire [15:0] result;
+    wire signed [15:0] result;
 
-    ALU test (
+    // Instantiate the ALU module under test
+    ALU uut (
         .input_a(input_a),
         .input_b(input_b),
         .alu_op(alu_op),
         .result(result)
     );
 
-    integer error, count;
+    integer error, i, j;
 
+    // Test sequence
     initial begin
-
+        // Initialize inputs and variables
+        error = 0;
         input_a = 16'b0;
         input_b = 16'b0;
         alu_op = 3'b000;
-        error = 0;
-        count = 0;
 
-        
-        while (count < 50) begin //truncated at 50 for a faster compile 
-
-        for (alu_op = 3'b000; alu_op <= 3'b011; alu_op = alu_op + 1) begin
-            #1;
+        // Loop through all possible values of input_a and input_b, up to 20 in 16-bit 2's complement
+    for (i = -10; i <= 10; i = i + 1) begin
+        input_a = i; // Assign value to input_a
+        for (j = -10; j <= 10; j = j + 1) begin
+            input_b = j; // Assign value to input_b
             
+            // Loop through all possible ALU operations (0 to 3)
+            for (alu_op = 3'b000; alu_op <= 3'b011; alu_op = alu_op + 1) begin
+            #5;
+            
+            // Check the result based on the current ALU operation
             case (alu_op)
-            3'b000: // multiplication
-                if (result != input_a * input_b) begin 
-                error = error + 1;
-                $display("Error in multiplication at input_a = %0b, input_b = %0b, result = %0b", input_a, input_b, result);
+                3'b000: // Test multiplication
+                if (result != input_a * input_b) begin
+                        #1
+                    error = error + 1;
+                        $display("a: %d, b: %d, result: %d", input_a,input_b,result);
                 end
-            3'b001: // addition
-                if (result != input_a + input_b) begin 
-                error = error + 1;
-                $display("Error in addition at input_a = %0b, input_b = %0b, result = %0b", input_a, input_b, result);
+                3'b001: // Test addition
+                if (result != input_a + input_b) begin
+                        #1 
+                    error = error + 1;
                 end
-            3'b010: // subtraction
-                if (result != input_a - input_b) begin 
-                error = error + 1;
-                $display("Error in subtraction at input_a = %0b, input_b = %0b, result = %0b", input_a, input_b, result);
+                3'b010: // Test subtraction
+                if (result != input_a - input_b) begin
+                        #1
+                    error = error + 1;
                 end
-            3'b011: // left shift
-                if (result != (input_b << input_a)) begin
-                error = error + 1;
-                $display("Error in left shift at input_a = %0b, input_b = %0b, result = %0b", input_a, input_b, result);
+                3'b011: // Test left or right shift based on input_a
+                if (input_a >= 0) begin
+                        #1
+                    // Test left shift
+                    if (result != (input_b <<< input_a[3:0])) begin
+                    error = error + 1;
+                    end
+                end else begin
+                    // Test arithmetic right shift
+                    if (result != (input_b >>> (-input_a[3:0]))) begin
+                    error = error + 1;
+                    end
                 end
             endcase
+            end
         end
-        
-        input_a = input_a + 1;
-        input_b = input_b + 1;
-        count = count + 1;
         end
 
-        $display("Simulation completed with %0d errors", error);
+        // End simulation
     end
 
     endmodule
+
 
     module tickFSM_test;
 
