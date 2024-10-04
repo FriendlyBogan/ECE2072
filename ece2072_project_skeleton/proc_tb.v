@@ -27,6 +27,8 @@ module proc_tb;
 	
 	initial begin 
 	clk = 0;
+	
+	//test for addi 
 	din = 9'b010001000;
 	rst = 0;
 	#7
@@ -47,6 +49,12 @@ module proc_tb;
 	#7
 	din = 9'b010101010;
 	#33
+	
+	// TEST add;
+	
+	din = 9'b001001011;
+	#40
+	
 
 	// TEST SUB
 	din = 9'b011010001;
