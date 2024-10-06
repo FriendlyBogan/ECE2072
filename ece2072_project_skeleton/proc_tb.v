@@ -58,6 +58,26 @@ module proc_tb;
 
 	// TEST SUB
 	din = 9'b011010001;
+	#40
+
+	// TEST MUL
+	din = 9'b100010001; 
+	#40
+	
+	// TEST MOVI
+	din = 9'b111110000;
+	#7
+	din = 9'b000000010;
+	#33
+	
+	// TEST MOVI
+	din = 9'b111111000;
+	#7
+	din = 9'b111111001;
+	#33
+	
+	// TEST MUL
+	din = 9'b100111110; 
 	#50
 	
 	$displpy("bus value: %b",bus);
