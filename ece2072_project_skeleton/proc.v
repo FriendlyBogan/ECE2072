@@ -55,7 +55,7 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out,tic
     // TODO: instantiate tick counter:
     tick_FSM tfsm(.clk(clk), .rst(rst), .enable(1'b1), .tick(tick));
 
-    reg [0:0] movi, add, addi,sub;
+    reg [0:0] movi, add, addi, sub, mul, ssi, disp, bez;
 
           
     
@@ -74,51 +74,33 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out,tic
             4'b0001:
                 begin
                     // TODO
-                    {movi, add, addi, sub} = 0;
-							{A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in} = 1'b0;
-                    IR_in = 1;
-                    if (IR_out[8:6] == 1) begin 
-                        add = 1;	
-                    end 
-                    else if (IR_out[8:6] == 2) begin 
-                        addi = 1;
-                    end 
-                    else if (IR_out[8:6] == 3) begin
-                        sub = 1;
-                    end
-                    else if (IR_out[8:6] == 7) begin 
-                        movi = 1;
-                    end  
-						  
+                    {movi, add, addi, sub, mul, ssi, disp, bez} = 0;
+                    {A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in} = 1'b0;
                     
-                   IR_in = 0; 
+                    IR_in = 0; 
                 end
             
             4'b0010:
                 begin
+                    case (IR_out[8:6])
+                            3'b000: disp = 1;
+                            3'b001: add = 1;
+                            3'b010: addi = 1;
+                            3'b011: sub = 1;
+                            3'b100: mul = 1;
+                            3'b101: ssi = 1;
+                            3'b110: bez = 1;
+                            3'b111: movi = 1;
+                    endcase
                     // TODO
-                    if (add) begin
+                    if (add | sub | addi | mul | ssi) begin
                         
                         BUS_control = IR_out[5:3]; //Rx
                         
                         A_in = 1; 
                         
                     end
-						  
-					else if (addi) begin 
-						  
-                        BUS_control = IR_out[5:3];//Rx
-                        
-                        A_in = 1;
-								
-                    end
-                    else if (sub) begin
-
-                        BUS_control = IR_out[5:3]; //Rx
-
-                        A_in = 1;
-
-                    end
+					
                     else if (movi) begin
                         BUS_control = 4'b1001; //Immediate Value
                         case (IR_out[5:3])
@@ -137,6 +119,16 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out,tic
             4'b0100:
                 begin
                     // TODO
+                    case (IR_out[8:6])
+                        3'b000: disp = 1;
+                        3'b001: add = 1;
+                        3'b010: addi = 1;
+                        3'b011: sub = 1;
+                        3'b100: mul = 1;
+                        3'b101: ssi = 1;
+                        3'b110: bez = 1;
+                        3'b111: movi = 1;
+                    endcase
 
                     if (add) begin
                         A_in = 0;
@@ -159,6 +151,15 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out,tic
                         ALU_op = 3'b001;
                     
                     end 
+                    else if (mul) begin
+                        A_in = 0;
+								
+                        BUS_control = IR_out[2:0]; //Ry
+
+                        G_in = 1;
+								
+						ALU_op = 3'b000;
+                    end 
 
                     else if (sub) begin
                         A_in = 0;
@@ -169,6 +170,18 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out,tic
 								
 						ALU_op = 3'b010;
                     end 
+                    else if (ssi) begin 
+                        
+                        A_in = 0;
+                        
+                        BUS_control = 4'b1001; //Immediate value
+                        
+                        G_in = 1;
+                        
+                        ALU_op = 3'b011;
+                    
+                    end 
+
 						  
                     else if (movi) begin
                         {A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in} = 1'b0;
@@ -178,63 +191,36 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out,tic
             
             4'b1000:
                 begin
+                    case (IR_out[8:6])
+                        3'b000: disp = 1;
+                        3'b001: add = 1;
+                        3'b010: addi = 1;
+                        3'b011: sub = 1;
+                        3'b100: mul = 1;
+                        3'b101: ssi = 1;
+                        3'b110: bez = 1;
+                        3'b111: movi = 1;
+                    endcase
                     // TODO
-                    if (add) begin
+                    if (add | sub | addi | mul | ssi) begin
 
                         BUS_control = 4'b1000;
 
                         G_in = 0;
 
-                    case (IR_out[5:3])
-                        3'b000: R0_in = 1;
-                        3'b001: R1_in = 1;
-                        3'b010: R2_in = 1;
-                        3'b011: R3_in = 1;
-                        3'b100: R4_in = 1;
-                        3'b101: R5_in = 1;
-                        3'b110: R6_in = 1;
-                        3'b111: R7_in = 1;
-                    endcase
+                        case (IR_out[5:3])
+                            3'b000: R0_in = 1;
+                            3'b001: R1_in = 1;
+                            3'b010: R2_in = 1;
+                            3'b011: R3_in = 1;
+                            3'b100: R4_in = 1;
+                            3'b101: R5_in = 1;
+                            3'b110: R6_in = 1;
+                            3'b111: R7_in = 1;
+                        endcase
                         
                     end
 						  
-                    else if (addi) begin 
-                    
-                        BUS_control = 4'b1000;
-                        
-                        G_in = 0;
-                        
-                    case (IR_out[5:3])
-                        3'b000: R0_in = 1;
-                        3'b001: R1_in = 1;
-                        3'b010: R2_in = 1;
-                        3'b011: R3_in = 1;
-                        3'b100: R4_in = 1;
-                        3'b101: R5_in = 1;
-                        3'b110: R6_in = 1;
-                        3'b111: R7_in = 1;
-                    endcase
-                        
-                    end
-                     
-                    else if (sub) begin 
-                    
-                        BUS_control = 4'b1000;
-                        
-                        G_in = 0;
-                        
-                    case (IR_out[5:3])
-                        3'b000: R0_in = 1;
-                        3'b001: R1_in = 1;
-                        3'b010: R2_in = 1;
-                        3'b011: R3_in = 1;
-                        3'b100: R4_in = 1;
-                        3'b101: R5_in = 1;
-                        3'b110: R6_in = 1;
-                        3'b111: R7_in = 1;
-                    endcase
-                        
-                    end 
 						  
                     
                     IR_in = 1;

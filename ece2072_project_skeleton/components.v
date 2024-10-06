@@ -74,7 +74,7 @@ module multiplexer(SignExtDin, R0, R1, R2, R3, R4, R5, R6, R7, G, sel, Bus);
  
 
 	// TODO: implement logic
-	always @(sel) begin 
+	always @(sel, SignExtDin, R0, R1, R2, R3, R4, R5, R6, R7, G) begin 
 		case (sel)   
 			4'b0000: Bus = R0; 
 			4'b0001: Bus = R1; 
