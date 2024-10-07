@@ -32,10 +32,6 @@ module proc_tb;
 	#10
 	din = 9'd255;
 	#30
-	
-	
-	
-	
 
 	if (R1!= 255) begin 
 		
