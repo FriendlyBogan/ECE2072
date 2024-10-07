@@ -41,12 +41,12 @@ module tick_FSM (
                 B: next_state = C;  
                 C: next_state = D;  
                 D: next_state = A; 
-                default: next_state = A;  
+                default: next_state = D;  
             endcase
         end
     end
 
-    always @(posedge clk or posedge rst) begin
+    always @(posedge clk) begin
         if (rst) begin
             current_state <= A;  
         end else begin
