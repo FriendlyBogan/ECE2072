@@ -63,16 +63,16 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out,tic
     initial begin 
         IR_in = 1;
         {A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in} = 1'b0;
-		  BUS_control = 0;
-		  IR_in = 0; 
+        BUS_control = 0;
+         
     end 
 
 	
     always @(tick,IR_out) begin
-							{movi, add, addi, sub} = 0;
-                    {A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in,IR_in} = 1'b0;
-						  BUS_control = 3'd0;
-						  ALU_op = 3'd0;
+        {movi, add, addi, sub} = 0;
+        {A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in,IR_in} = 1'b0;
+        BUS_control = 3'd0;
+        ALU_op = 3'd0;
 						 
         // TODO: Turn off all control signals:
         // TODO: Turn on specific control signals based on current tick:
