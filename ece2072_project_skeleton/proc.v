@@ -5,7 +5,7 @@ This file contains Verilog code to implement individual the CPU.
 Please enter your student ID:
 
 */
-module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out,tick, BUS_control, SignExtDin, ALU_out);
+module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick);
 
     // Note: The skeleton you are provided with includes output ports to output the values of the internal registers R0 - R7, for the purpose of test benching. When instantiating the processor to program your DE10-lite, you can leave these ports unused.
     
@@ -15,18 +15,18 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7,IR_out,tic
     input [8:0]din;
     output [15:0] bus; 
     output [15:0] R0, R1, R2, R3, R4, R5, R6, R7;
-    
+    output wire [3:0] tick;
     
 
     // TODO: declare wires:
     wire [15:0] G_out, A_out;
-	 output [15:0] ALU_out;
-    output wire [3:0] tick;
-    output wire [8:0] IR_out;
+	wire [15:0] ALU_out;
+    
+    wire [8:0] IR_out;
     reg IR_in, A_in, G_in;
     reg R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in;
-    output wire [15:0] SignExtDin;
-    output reg [3:0] BUS_control;
+    wire [15:0] SignExtDin;
+    reg [3:0] BUS_control;
     reg [2:0] ALU_op;
 	 
 
