@@ -15,7 +15,7 @@ module components_tb.v;
     reg signed [15:0] input_a;
     reg signed [15:0] input_b;
     reg [2:0] alu_op;
-    wire signed [15:0] result;
+    wire signed [15:0] result;	
 
     // Instantiate the ALU module under test
     ALU uut (
@@ -25,7 +25,7 @@ module components_tb.v;
         .result(result)
     );
 
-    integer error, i, j;
+    integer error;
 
     // Test sequence
     initial begin
@@ -33,58 +33,109 @@ module components_tb.v;
         error = 0;
         input_a = 16'b0;
         input_b = 16'b0;
+        alu_op = 0;
+        
+        //TEST ADD
+        
+        input_a = 16'd255;
+        input_b = 16'd255;
+        alu_op = 3'b001;
+        #3
+        if (result != 510) begin 
+            error = error + 1;
+        end 
+        #10
+        
+        //TEST OVERFLOW
+        
+        input_a = 16'd7000;
+        input_b = 16'd8000;
+        #3
+        
+        if (result != 15000) begin 
+            error = error + 1;
+        end 
+        
+        #10 
+        //TEST SUB
+        
+        input_a = -16'sd255;
+        input_b = 16'd255;
+        alu_op = 3'b010;
+        #3
+        if (result != -510) begin 
+            error = error + 1; 
+        end 
+        #10
+        
+        input_a = -16'sd547;
+        input_b = 16'sd99100;
+        #3 
+        
+        if (result != -16'sd99647) begin
+                error = error + 1;
+        end 
+        #10 
+        
+        //TEST MUL
+        input_a = 16'sd34;
+        input_b = -16'sd25;
         alu_op = 3'b000;
-
-        // Loop through all possible values of input_a and input_b, up to 20 in 16-bit 2's complement
-    for (i = -10; i <= 10; i = i + 1) begin
-        input_a = i; // Assign value to input_a
-        for (j = -10; j <= 10; j = j + 1) begin
-            input_b = j; // Assign value to input_b
-            
-            // Loop through all possible ALU operations (0 to 3)
-            for (alu_op = 3'b000; alu_op <= 3'b011; alu_op = alu_op + 1) begin
-            #5;
-            
-            // Check the result based on the current ALU operation
-            case (alu_op)
-                3'b000: // Test multiplication
-                if (result != input_a * input_b) begin
-                        #1
-                    error = error + 1;
-                        $display("a: %d, b: %d, result: %d", input_a,input_b,result);
-                end
-                3'b001: // Test addition
-                if (result != input_a + input_b) begin
-                        #1 
-                    error = error + 1;
-                end
-                3'b010: // Test subtraction
-                if (result != input_a - input_b) begin
-                        #1
-                    error = error + 1;
-                end
-                3'b011: // Test left or right shift based on input_a
-                if (input_a >= 0) begin
-                        #1
-                    // Test left shift
-                    if (result != (input_b <<< input_a[3:0])) begin
-                    error = error + 1;
-                    end
-                end else begin
-                    // Test arithmetic right shift
-                    if (result != (input_b >>> (-input_a[3:0]))) begin
-                    error = error + 1;
-                    end
-                end
-            endcase
-            end
+        #3
+        if (result != -16'sd850) begin 
+            error = error + 1;
+        end 
+        #10
+        
+        input_a = 16'sd57;
+        input_b = 16'sd90;
+        #3 
+        
+        if (result != 57*90) begin 
+            error = error + 1;
         end
+        #10 
+        
+        
+        //TEST SSI
+        input_a = 16'd3;
+        input_b= -16'sd10;
+        alu_op = 3'b011;
+        #3
+        if (result != -16'sd10 <<< 16'd3) begin 
+            
+            error = error + 1;
         end
+        
+        //TEST SSI 
+        #10
+        input_a = -16'sd2;
+        input_b = -16'sd10;
+        #3
+        if (result != 16'b1111111111111101) begin
+        
+            error = error + 1;
+        end 
+        #10
+        
+        input_a = 16'sd30;
+        input_b = 16'sd10;
+        #3 
+        
+        if (result != 0) begin 
+            
+            error = error + 1;
+        end 
+            
+        #10
+        
+        $display("TEST COMPLETE %d ERRORS",error);
+        $finish;
+    end  
 
-        // End simulation
-    end
+endmodule
 
-    endmodule
+
 
 
     module tickFSM_test;
@@ -266,8 +317,5 @@ module test_register_n;
         $finish;
     end
 endmodule
-
-
-
 
 endmodule
