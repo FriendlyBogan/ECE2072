@@ -202,8 +202,9 @@ module test_register_n;
     reg [15:0] data_in;
     reg rst, r_in, clk;
     wire [15:0]Q;
+    wire [8:0]R;
     register_n #(.N(16)) test(.data_in(data_in), .r_in(r_in), .clk(clk), .rst(rst), .Q(Q));
-    
+    register_n #(.N(9)) test1(.data_in(data_in), .r_in(r_in), .clk(clk), .rst(rst), .Q(R));
     integer count, error;
     initial begin
         data_in = 16'b1111;
@@ -220,6 +221,10 @@ module test_register_n;
             error = error + 1;
             $display("Q is %b, should be 0", Q);
         end
+        if (R != 0) begin
+            error = error + 1;
+            $display("R is %b, should be 0", R);
+        end
         #1
         rst = 0;
         r_in = 0;
@@ -230,6 +235,11 @@ module test_register_n;
         if (Q != 0) begin
             error = error + 1;
             $display("Q is %b, should be 0", Q);
+        end
+		  
+        if (R != 0) begin
+            error = error + 1;
+            $display("R is %b, should be 0", R);
         end
         #1
         r_in = 1;
@@ -247,11 +257,17 @@ module test_register_n;
             error = error + 1;
             $display("Q is %b, should be %b", Q, data_in);
         end
+        if (R != data_in[8:0]) begin
+            error = error + 1;
+            $display("R is %b, should be %b", R, data_in[8:0]);
+        end
 
         end
         $finish;
     end
 endmodule
+
+
 
 
 endmodule
