@@ -204,9 +204,7 @@ module proc_extension(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick,d
                     end 
 
 						  
-                    else if (movi|disp) begin
-                        {A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in} = 1'b0;
-                    end
+
 
                 end
             
