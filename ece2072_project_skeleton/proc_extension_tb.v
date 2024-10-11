@@ -6,7 +6,7 @@ This file contains a Verilog test bench to test the correctness of the processor
 Please enter your student ID:
 
 */
-module proc_tb;
+module proc_extension_tb;
     // TODO: Implement the logic of your testbench here
 	 
 	 reg clk, rst;
@@ -14,11 +14,11 @@ module proc_tb;
 	 wire [8:0]IR_out;
 	
 	 reg [8:0] din;
-	 
+	 wire[15:0] display;
 	 wire [3:0]tick;
 	 wire [15:0] bus, R0, R1, R2, R3, R4, R5, R6, R7;
 	 integer error;
-	 proc_extension uut(.clk(clk), .rst(rst), .din(din), .bus(bus), .R0(R0), .R1(R1),.R2(R2), .R3(R3), .R4(R4), .R5(R5), .R6(R6), .R7(R7),.tick(tick));
+	 proc_extension uut(.clk(clk), .rst(rst), .din(din), .bus(bus), .R0(R0), .R1(R1),.R2(R2), .R3(R3), .R4(R4), .R5(R5), .R6(R6), .R7(R7),.tick(tick), .display(display));
 	 
 	always #5 clk = ~clk;
 	
