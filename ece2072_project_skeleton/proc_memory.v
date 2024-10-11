@@ -15,7 +15,7 @@ This file contains Verilog code to implement individual the CPU.
 Please enter your student ID:
 
 */
-module proc_extension(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick,display);
+module proc_memory(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick,display);
 
     // Note: The skeleton you are provided with includes output ports to output the values of the internal registers R0 - R7, for the purpose of test benching. When instantiating the processor to program your DE10-lite, you can leave these ports unused.
     
@@ -24,7 +24,6 @@ module proc_extension(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick,d
     input rst;
     input [8:0]din;
     output [15:0] bus; 
-    output [15:0] PC;
     output [15:0] R0, R1, R2, R3, R4, R5, R6, R7;
     output wire [3:0] tick;
     output [15:0] display;
@@ -35,11 +34,11 @@ module proc_extension(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick,d
 	 wire [15:0] ALU_out;
     wire [8:0] IR_out;
     reg IR_in, A_in, G_in, H_in;
-    reg R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in,PC_in;
+    reg R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in;
     wire [15:0] SignExtDin;
     reg [3:0] BUS_control;
     reg [2:0] ALU_op;
-	
+	 
 
     // TODO: instantiate registers:
     register_n  #(.N(9))reg_IR(.r_in(IR_in), .clk(clk), .data_in(din), .rst(rst), .Q(IR_out));
@@ -54,7 +53,6 @@ module proc_extension(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick,d
     register_n  reg_5(.r_in(R5_in), .clk(clk), .data_in(bus), .rst(rst), .Q(R5));
     register_n  reg_6(.r_in(R6_in), .clk(clk), .data_in(bus), .rst(rst), .Q(R6));
     register_n  reg_7(.r_in(R7_in), .clk(clk), .data_in(bus), .rst(rst), .Q(R7));
-    register_n  PC(.r_in(PC_in), .clk(clk), .data_in(bus), .rst(rst), .Q(PC));
     
 	 
 	
@@ -74,16 +72,16 @@ module proc_extension(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick,d
     
     // TODO: define control unit:
     initial begin 
-        IR_in = 1;
-        {A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in,PC_in} = 1'b0;
-		  BUS_control = 0;
+	    IR_in = 1;
+        {A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in} = 1'b0;
+		BUS_control = 0;
     end 
 
 	
     always @(tick) begin
         // TODO: Turn off all control signals:
         {movi, add, addi, sub, mul, ssi, disp, bez} = 0;
-        {A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in, IR_in, H_in,PC_in} = 1'b0;
+        {A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in, IR_in, H_in} = 1'b0;
         
         ALU_op = 3'd0;
         // TODO: Turn on specific control signals based on current tick:
@@ -92,7 +90,6 @@ module proc_extension(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick,d
                 begin
                     // TODO
                     IR_in = 1;
-                    PC_in = 1;
                 end
             
             4'b0010:
@@ -110,15 +107,19 @@ module proc_extension(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick,d
 								{add, addi, sub, movi, mul, ssi, bez, disp} = 0;
                     endcase
                     // TODO
-                    if (add | sub | addi | mul | ssi) begin
+                    if (add | sub | addi | mul) begin
                         
                         BUS_control = IR_out[5:3]; //Rx
                         
                         A_in = 1; 
-
-                        
                         
                     end
+						  else if (ssi) begin
+								BUS_control = 4'b1001; //Rx
+                        
+                        A_in = 1; 
+                        
+							end
 					
                     else if (movi) begin
                         BUS_control = 4'b1001; //Immediate Value
@@ -200,7 +201,7 @@ module proc_extension(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick,d
                         
                         A_in = 0;
                         
-                        BUS_control = 4'b1001; //Immediate value
+                        BUS_control = IR_out[5:3]; //Rx
                         
                         G_in = 1;
                         
@@ -248,11 +249,7 @@ module proc_extension(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick,d
                         endcase
                         
                     end
-						  
-						  
-                
-						  
-						  
+		  
                 end
             
             default:
