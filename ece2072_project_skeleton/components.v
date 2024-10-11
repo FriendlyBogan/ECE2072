@@ -125,11 +125,11 @@ module ALU (input_a, input_b, alu_op, result);
 				
 				if (input_a >= 0) begin
 				
-                    result_calc = input_b <<< input_a[3:0]; // only ranging [3:0] so that it would only shift in range of 16 bits 
+                    result_calc = input_b <<< input_a; // only ranging [3:0] so that it would only shift in range of 16 bits 
 						  
                 end else begin
 					 
-                    result_calc = input_b >>> -input_a[3:0]; // - to make it negative
+                    result_calc = input_b >>> -input_a; // - to make it negative
 						  
 				end
 			
