@@ -9,78 +9,80 @@ Please enter your student ID:
 module proc_tb;
     // TODO: Implement the logic of your testbench here
 	 
-	 reg clk, rst;
-	 
-	 wire [8:0]IR_out;
-	
-	 reg [8:0] din;
-	 
-	 wire [3:0]tick;
-	 wire [3:0]bus_contr;
-	wire [15:0] sign_ext;
-	 wire [15:0] bus, R0, R1, R2, R3, R4, R5, R6, R7;
-	 wire [15:0] ALU_wire;
-	 
-	 simple_proc uut(.clk(clk), .rst(rst), .din(din), .ALU_out(ALU_wire), .bus(bus), .R0(R0), .R1(R1), .SignExtDin(sign_ext),.R2(R2), .R3(R3), .R4(R4), .R5(R5), .R6(R6), .R7(R7),.IR_out(IR_out),.tick(tick), .BUS_control(bus_contr));
+	reg clk, rst;
+	reg [8:0] din;
+	wire [3:0]tick;
+	wire [15:0] bus, R0, R1, R2, R3, R4, R5, R6, R7;
+	integer error;
+	simple_proc uut(.clk(clk), .rst(rst), .din(din), .bus(bus), .R0(R0), .R1(R1), .R2(R2), .R3(R3), .R4(R4), .R5(R5), .R6(R6), .R7(R7),.tick(tick));
 	 
 	always #5 clk = ~clk;
 	
 	initial begin 
 	clk = 0;
-	
-	//test for addi 
-	din = 9'b010001000;
+	error = 0;
+	//TEST ADDI 
+	#7
+	din = 9'b010001000; //R1
 	rst = 0;
-	#7
-	din = 9'b100000001;
-	#33;
-	din = 9'b010001000;
-	#7
-	din = 9'd89;
-	#33
-	din = 9'b010001000;
-	#7
-	din = 9'd2;
-	#33
+	#10
+	din = -9'sd255;
+	#30
+
+	if (R1!= -9'sd255) begin 
+		
+		error = error + 1;
+	end
 	
+	din = 9'b010001000; //R1
+	#10
+	din = -9'sd340; 
+	#30
+	
+	if (R1 != -9'sd595) begin 
+	
+		error = error + 1;
+	end 
+	
+
 	// TEST MOVI
 
-	din = 9'b111010000;
-	#7
-	din = 9'b010101010;
-	#33
+	din = 9'b111010000; //r2
+	#10
+	din = 9'sd600;
+	#30
+	
+	if (R2 != 9'sd600) begin 
+		
+		error = error + 1;
+	end 
+	
 	
 	// TEST add;
-	
-	din = 9'b001001011;
+
+	din = 9'b001001010; //R1 + R2
 	#40
 	
-
+	if (R1 != 9'd5) begin 
+		 
+		error = error + 1;
+	end 
+	
+	
 	// TEST SUB
-	din = 9'b011010001;
+	din = 9'b011010001; //R2 - R1
 	#40
+	
+	if (R2 != 9'd83) begin 
+	
+		error = error + 1;
+	end 
+	
+	#10
+	
+	
+	$display("TEST COMPLETE %d ERRORS",error);
 
-	// TEST MUL
-	din = 9'b100010001; 
-	#40
-	
-	// TEST MOVI
-	din = 9'b111110000;
-	#7
-	din = 9'b000000010;
-	#33
-	
-	// TEST MOVI
-	din = 9'b111111000;
-	#7
-	din = 9'b111111001;
-	#33
-	
-	// TEST MUL
-	din = 9'b100111110; 
-	#50
-	
-	$displpy("bus value: %b",bus);
 	$finish;
 	end 	
 	 
