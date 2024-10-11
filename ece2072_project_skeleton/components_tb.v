@@ -245,9 +245,6 @@ endmodule
 	end
 	
     endmodule 
-	
-	
-endmodule
 
 module test_register_n;
     reg [15:0] data_in;
