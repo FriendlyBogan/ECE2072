@@ -7,10 +7,7 @@ This file contains a Verilog test bench to test the correctness of the individua
 Please enter your student ID: 33808481
 
 */
-module components_tb.v;
-    // TODO: Implement the logic of your testbench here
-    module alu_test;
-
+module components_tb; 
     // Declare the testbench signals
     reg signed [15:0] input_a;
     reg signed [15:0] input_b;
@@ -129,131 +126,157 @@ module components_tb.v;
             
         #10
         
-        $display("TEST COMPLETE %d ERRORS",error);
-        $finish;
+        $display("ALU COMPLETE %d ERRORS",error);
     end  
 
-endmodule
 
 
 
 
-    module tickFSM_test;
-
-        reg clk, rst, enable;
+        reg clk, rst_1, enable;
         wire [3:0] tick;
 
         tick_FSM fsm (
             .clk(clk),
-            .rst(rst),
+            .rst(rst_1),
             .enable(enable),
             .tick(tick)
         );
         
-        always #5 clk = ~clk;
+        always #15 clk = ~clk;
         
         initial begin
             clk = 0;
-            rst = 1; 
+            rst_1 = 1; 
             enable = 0;
+				if (tick != 4'b0001) begin 
+					
+					error = error + 1;
+				end 
             
-            #10 rst = 0;
+            #30 rst_1 = 0;
+				
+				if (tick != 4'b0001) begin 
+					
+					error = error + 1;
+				end 
 
-            #10 enable = 1;
-            
-            #100 $finish;
-        end
+            #30 enable = 1;
+					
+				if (tick != 4'b0001) begin 
+					
+					error = error + 1;
+				end 
+				#30 
+				
+				if (tick != 4'b0010) begin 
+					
+					error = error + 1;
+				end 
+				#30 
+				
+				if (tick != 4'b0100) begin 
+					
+					error = error + 1;
+				end 
+				#30
+				
+				if (tick != 4'b1000) begin 
+					
+					error = error + 1;	
+				end 
+            #200 
+				$display("TICK FSM COMPLETE %d ERROR",error);
+				$display("ALL COMPONENTS TEST FINISH, %d ERROR", error);
+				$finish;
+				
+        end		  
 
-        initial begin
-            $display("Tick: %b", tick);
-        end
-
-    endmodule
-
-    module sign_extend_test;
-
-	reg [8:0] data_in;
+	reg [8:0] data_in1;
 	wire [15:0] data_out;
 	
 	
-	sign_extend test ( // Instance of the sign_extend module
-		.in(data_in), 
+	sign_extend test(
+		.in(data_in1), 
 		.ext(data_out)
 	);
-	
-	integer error;
 
-	initial begin
-	  error = 0;
-	  
+
+	
+	initial begin 
     // Edge case: Most negative number
-    data_in = 9'b100000000;
+    data_in1 = 9'b100000000;
     #10;
-		if (data_out[15] != data_in[8]) begin 
+		if (data_out[15] != data_in1[8]) begin 
 			error = error + 1;
+			$display("Input = %b, Output = %b (expected: 1111111100000000)", data_in1, data_out);
 		end 
-    $display("Input = %b, Output = %b (expected: 1111111100000000)", data_in, data_out);
+    
     
     // Edge case: Most positive number
-    data_in = 9'b011111111;
+    data_in1 = 9'b011111111;
     #10;
-		if (data_out[15] != data_in[8]) begin 
+		if (data_out[15] != data_in1[8]) begin 
 			error = error + 1;
+			$display("Input = %b, Output = %b (expected: 0000000011111111)", data_in1, data_out);
 		end 
-    $display("Input = %b, Output = %b (expected: 0000000011111111)", data_in, data_out);
-
     // Edge case: Zero
-    data_in = 9'b000000000;
+    data_in1 = 9'b000000000;
     #10;
-		if (data_out[15] != data_in[8]) begin 
+		if (data_out[15] != data_in1[8]) begin 
 			error = error + 1;
+			$display("Input = %b, Output = %b (expected: 0000000000000000)", data_in1, data_out);
 		end 
-    $display("Input = %b, Output = %b (expected: 0000000000000000)", data_in, data_out); //here the positive and negative 0 dont care
+     //here the positive and negative 0 dont care
     
     // Small positive number
-    data_in = 9'b000000001;
+    data_in1 = 9'b000000001;
     #10;
-		if (data_out[15] != data_in[8]) begin 
+		if (data_out[15] != data_in1[8]) begin 
 			error = error + 1;
+			$display("Input = %b, Output = %b (expected: 0000000000000001)", data_in1, data_out);
 		end 
-    $display("Input = %b, Output = %b (expected: 0000000000000001)", data_in, data_out);
-
+    
     // Small negative number
-    data_in = 9'b111111111;
+    data_in1 = 9'b111111111;
     #10;
-		if (data_out[15] != data_in[8]) begin 
+		if (data_out[15] != data_in1[8]) begin 
 			error = error + 1;
+			$display("Input = %b, Output = %b (expected: 1111111111111111)", data_in1, data_out);
 		end 
-    $display("Input = %b, Output = %b (expected: 1111111111111111)", data_in, data_out);
+   
 
     // Mid-range positive number
-    data_in = 9'b010101010;
+    data_in1 = 9'b010101010;
     #10;
-		if (data_out[15] != data_in[8]) begin 
+		if (data_out[15] != data_in1[8]) begin 
 			error = error + 1;
+			$display("Input = %b, Output = %b (expected: 0000000010101010)", data_in1, data_out);
 		end 
-    $display("Input = %b, Output = %b (expected: 0000000010101010)", data_in, data_out);
+    
 
     // Mid-range negative number
-    data_in = 9'b101010101;
+    data_in1 = 9'b101010101;
     #10;
-		if (data_out[15] != data_in[8]) begin 
+		if (data_out[15] != data_in1[8]) begin 
 			error = error + 1;
+			$display("Input = %b, Output = %b (expected: 11111111101010101)", data_in1, data_out);
 		end 
-    $display("Input = %b, Output = %b (expected: 11111111101010101)", data_in, data_out);
-	 #5 $finish;
+    
+	 $display("SIGN EXT TEST COMPLETE, %d errors",error);
 	end
 	
-    endmodule 
 
-module test_register_n;
+	
+	
+
     reg [15:0] data_in;
-    reg rst, r_in, clk;
+    reg rst, r_in;
     wire [15:0]Q;
     wire [8:0]R;
-    register_n #(.N(16)) test(.data_in(data_in), .r_in(r_in), .clk(clk), .rst(rst), .Q(Q));
+    register_n #(.N(16)) test3(.data_in(data_in), .r_in(r_in), .clk(clk), .rst(rst), .Q(Q));
     register_n #(.N(9)) test1(.data_in(data_in), .r_in(r_in), .clk(clk), .rst(rst), .Q(R));
-    integer count, error;
+    integer count;
     initial begin
         data_in = 16'b1111;
         rst = 1;
@@ -292,9 +315,9 @@ module test_register_n;
         #1
         r_in = 1;
         data_in = 0;
+		  $display("REGISTER OOMPLETE, %d ERROR",error);
     end
 
-    always #15 clk = ~clk;
 
     always begin
         for (count = 0; count < 1000; count = count + 1) begin
@@ -309,10 +332,11 @@ module test_register_n;
             error = error + 1;
             $display("R is %b, should be %b", R, data_in[8:0]);
         end
-
+		
         end
-        $finish;
+		 
     end
+	 
 endmodule
 
-endmodule
+	 
