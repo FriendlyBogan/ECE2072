@@ -72,9 +72,9 @@ module proc_extension(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick,d
     
     // TODO: define control unit:
     initial begin 
-        IR_in = 1;
+	    IR_in = 1;
         {A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in} = 1'b0;
-		  BUS_control = 0;
+		BUS_control = 0;
     end 
 
 	
@@ -107,13 +107,19 @@ module proc_extension(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick,d
 								{add, addi, sub, movi, mul, ssi, bez, disp} = 0;
                     endcase
                     // TODO
-                    if (add | sub | addi | mul | ssi) begin
+                    if (add | sub | addi | mul) begin
                         
                         BUS_control = IR_out[5:3]; //Rx
                         
                         A_in = 1; 
                         
                     end
+						  else if (ssi) begin
+								BUS_control = 4'b1001; //Rx
+                        
+                        A_in = 1; 
+                        
+							end
 					
                     else if (movi) begin
                         BUS_control = 4'b1001; //Immediate Value
@@ -195,7 +201,7 @@ module proc_extension(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick,d
                         
                         A_in = 0;
                         
-                        BUS_control = 4'b1001; //Immediate value
+                        BUS_control = IR_out[5:3]; //Rx
                         
                         G_in = 1;
                         
@@ -203,6 +209,10 @@ module proc_extension(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick,d
                     
                     end 
 
+						  
+                    else if (movi|disp) begin
+                        {A_in, G_in, R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in} = 1'b0;
+                    end
 
                 end
             
@@ -239,11 +249,7 @@ module proc_extension(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick,d
                         endcase
                         
                     end
-						  
-						  
-                
-						  
-						  
+		  
                 end
             
             default:
