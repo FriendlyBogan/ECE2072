@@ -20,8 +20,7 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick);
 
     // TODO: declare wires:
     wire [15:0] G_out, A_out;
-	wire [15:0] ALU_out;
-    
+	 wire [15:0] ALU_out;
     wire [8:0] IR_out;
     reg IR_in, A_in, G_in;
     reg R0_in, R1_in, R2_in, R3_in, R4_in, R5_in, R6_in, R7_in;
@@ -80,9 +79,7 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick);
             4'b0001:
                 begin
                     // TODO
-                    
-                   
-                    
+                    IR_in = 1;
                 end
             
             4'b0010:
@@ -140,7 +137,7 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick);
 
                         G_in = 1;
 								
-						ALU_op = 3'b001;
+								ALU_op = 3'b001;
                     end 
 						  
                     else if (addi) begin 
@@ -202,17 +199,11 @@ module simple_proc(clk, rst, din, bus, R0, R1, R2, R3, R4, R5, R6, R7, tick);
                         endcase
                         
                     end
-						  
-						  
-                    
-                    IR_in = 1;
-						  
-						  
                 end
             
             default:
                 begin
-                    IR_in = 1;
+                    IR_in = 0;
                 end
 
         endcase
