@@ -137,21 +137,8 @@ module ALU (input_a, input_b, alu_op, result);
 			
 		endcase
 		
-		if (result_calc > 16'sb0111111111111111) begin
-		
-			 result = 16'sb0111111111111111;  // limit to the max positive 16-bit value
-			 
-		end else if (result_calc < 16'sb1000000000000000) begin
-		
-			 result = 16'sb1000000000000000;  // limit to the max negative 16-bit value
-			 
-		end else begin
-		
-			 result = result_calc[15:0]; 
-			 
-		end
-		
-		
+		result = result_calc[15:0]; 
+
 	end
 endmodule
 
